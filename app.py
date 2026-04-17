@@ -5,7 +5,7 @@ import numpy as np
 import io
 
 app = Flask(__name__)
-app.secret_key = 'photoguard_secret_2024'
+app.secret_key = os.environ.get('SECRET_KEY', 'photoguard_secret_2024')
 app.config['UPLOAD_FOLDER'] = 'static/uploads'
 app.config['MAX_CONTENT_LENGTH'] = 16 * 1024 * 1024
 
@@ -199,4 +199,5 @@ def logout():
     return redirect(url_for('login'))
 
 if __name__ == '__main__':
-    app.run(debug=True)
+    port = int(os.environ.get('PORT', 5000))
+    app.run(host='0.0.0.0', port=port, debug=False)
