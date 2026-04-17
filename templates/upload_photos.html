@@ -1,0 +1,102 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width,initial-scale=1">
+  <title>PhotoGuard — Upload Photos</title>
+  <link rel="stylesheet" href="{{ url_for('static', filename='css/style.css') }}">
+</head>
+<body>
+<div class="page-wrapper">
+
+  <aside class="sidebar">
+    <div class="sidebar-logo">
+      <div class="logo-row">
+        <div class="logo-shield">🛡️</div>
+        <span class="logo-text">Photo<em>Guard</em></span>
+      </div>
+    </div>
+    <div class="sidebar-profile">
+      <div class="avatar">{{ user[0].upper() }}</div>
+      <div>
+        <div class="profile-email">{{ user }}</div>
+        <span class="badge badge-public">Public</span>
+      </div>
+    </div>
+    <nav class="nav">
+      <div class="nav-label">Menu</div>
+      <a href="/home/public" class="nav-link"><span class="nav-icon">🏠</span> {{ t.home }}</a>
+      <a href="/upload-photos" class="nav-link active"><span class="nav-icon">📸</span> {{ t.upload_photos }}</a>
+      <a href="/trusted-friends" class="nav-link"><span class="nav-icon">👥</span> {{ t.trusted_friends }}</a>
+      <a href="/ai-detection" class="nav-link"><span class="nav-icon">🤖</span> {{ t.ai_detection }}</a>
+    </nav>
+    <div class="sidebar-footer">
+      <a href="/logout" class="logout-link">🚪 {{ t.logout }}</a>
+    </div>
+  </aside>
+
+  <main class="main">
+    <div class="topbar">
+      <button class="hamburger" onclick="toggleSidebar()">☰</button>
+      <div style="padding-left:12px;">
+        <div class="topbar-title">📸 {{ t.upload_photos }}</div>
+        <div class="topbar-sub">Only uploaded photos are monitored — you're always in control</div>
+      </div>
+    </div>
+
+    {% with messages = get_flashed_messages(with_categories=true) %}
+      {% if messages %}
+        <div class="flashes">
+          {% for cat, msg in messages %}
+            <div class="flash flash-{{ cat }}">{{ '✅' if cat=='success' else 'ℹ️' }} {{ msg }}</div>
+          {% endfor %}
+        </div>
+      {% endif %}
+    {% endwith %}
+
+    <div class="content">
+
+      <div class="card">
+        <div class="card-head"><div class="card-icon">📤</div>Upload New Photos</div>
+        <form method="POST" enctype="multipart/form-data">
+          <div class="upload-zone" id="zone-photos" style="max-width:520px;margin-bottom:18px;">
+            <input type="file" name="photos" id="photo-upload" accept="image/*" multiple>
+            <div class="upload-zone-icon">🖼️</div>
+            <div class="upload-zone-title">Click or Drag Photos Here</div>
+            <div class="upload-zone-hint">JPG, PNG, WEBP supported &nbsp;·&nbsp; Multiple files allowed</div>
+          </div>
+          <button type="submit" class="btn btn-primary">📤 &nbsp;Upload & Protect</button>
+        </form>
+      </div>
+
+      <div class="card">
+        <div class="card-head" style="justify-content:space-between;">
+          <span style="display:flex;align-items:center;gap:10px;">
+            <div class="card-icon">🗂️</div>
+            Protected Photos
+          </span>
+          <span style="font-size:13px;color:var(--muted);font-weight:400;">{{ photos|length }} photo{{ 's' if photos|length != 1 }}</span>
+        </div>
+
+        {% if photos %}
+          <div class="gallery stagger">
+            {% for photo in photos %}
+            <div class="gallery-thumb">
+              <img src="{{ url_for('static', filename='uploads/' + photo) }}" alt="{{ photo }}">
+            </div>
+            {% endfor %}
+          </div>
+        {% else %}
+          <div class="empty">
+            <div class="empty-icon">📸</div>
+            <div class="empty-text">No photos protected yet. Upload photos above to begin.</div>
+          </div>
+        {% endif %}
+      </div>
+
+    </div>
+  </main>
+</div>
+<script src="{{ url_for('static', filename='js/main.js') }}"></script>
+</body>
+</html>

@@ -1,0 +1,170 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width,initial-scale=1">
+  <title>PhotoGuard — Secure Your Photos</title>
+  <link rel="stylesheet" href="{{ url_for('static', filename='css/style.css') }}">
+  <style>
+    .auth-form { display:none; }
+    #form-login { display:block; }
+  </style>
+</head>
+<body>
+<div class="login-page">
+
+  <!-- Left branding -->
+  <div class="login-left">
+    <div class="login-brand">
+      <div class="login-logo">🛡️</div>
+      <h1 class="login-title">Photo<em>Guard</em></h1>
+      <p class="login-subtitle">{{ t.tagline }}</p>
+    </div>
+
+    <div class="feature-pills stagger">
+      <div class="pill">
+        <div class="pill-icon">🔗</div>
+        <div>
+          <div class="pill-title">Link Your Socials</div>
+          <div class="pill-sub">Monitor Instagram, Snapchat, Twitter & more</div>
+        </div>
+      </div>
+      <div class="pill">
+        <div class="pill-icon">🤖</div>
+        <div>
+          <div class="pill-title">AI Morph Detection</div>
+          <div class="pill-sub">Identify AI-generated or manipulated photos</div>
+        </div>
+      </div>
+      <div class="pill">
+        <div class="pill-icon">👥</div>
+        <div>
+          <div class="pill-title">Trusted Circle</div>
+          <div class="pill-sub">Grant safe access to people you trust</div>
+        </div>
+      </div>
+      <div class="pill">
+        <div class="pill-icon">🔒</div>
+        <div>
+          <div class="pill-title">Private & Public Modes</div>
+          <div class="pill-sub">Full protection or selective photo guarding</div>
+        </div>
+      </div>
+    </div>
+  </div>
+
+  <!-- Right auth panel -->
+  <div class="login-right">
+    <div class="auth-box fade-up">
+
+      <!-- Flash messages -->
+      {% with messages = get_flashed_messages(with_categories=true) %}
+        {% if messages %}
+          {% for cat, msg in messages %}
+            <div class="flash flash-{{ cat }}" style="margin-bottom:14px;">
+              {{ '✅' if cat=='success' else '❌' if cat=='error' else 'ℹ️' }}
+              {{ msg }}
+            </div>
+          {% endfor %}
+        {% endif %}
+      {% endwith %}
+
+      <!-- Language -->
+      <div class="lang-row">
+        <span class="lang-ico">🌐</span>
+        <span class="lang-lbl">{{ t.language }}:</span>
+        <select class="form-select" onchange="changeLang(this.value)" style="flex:1;">
+          <option value="en" {% if current_lang=='en' %}selected{% endif %}>English</option>
+          <option value="hi" {% if current_lang=='hi' %}selected{% endif %}>हिंदी</option>
+          <option value="mr" {% if current_lang=='mr' %}selected{% endif %}>मराठी</option>
+          <option value="es" {% if current_lang=='es' %}selected{% endif %}>Español</option>
+          <option value="fr" {% if current_lang=='fr' %}selected{% endif %}>Français</option>
+        </select>
+      </div>
+
+      <!-- Tabs -->
+      <div class="auth-tabs">
+        <button class="auth-tab active" id="tab-login" onclick="switchTab('login')">{{ t.login }}</button>
+        <button class="auth-tab" id="tab-register" onclick="switchTab('register')">{{ t.register }}</button>
+      </div>
+
+      <!-- LOGIN -->
+      <form class="auth-form" id="form-login" method="POST" action="/login">
+        <input type="hidden" name="action" value="login">
+        <input type="hidden" name="lang" class="lang-hidden" value="{{ current_lang }}">
+
+        <div class="form-group">
+          <label class="form-label">{{ t.email }}</label>
+          <div class="input-wrap">
+            <span class="input-prefix">✉️</span>
+            <input type="email" name="email" class="form-input" placeholder="you@example.com" required>
+          </div>
+        </div>
+
+        <div class="form-group">
+          <label class="form-label">{{ t.password }}</label>
+          <div class="input-wrap">
+            <span class="input-prefix">🔑</span>
+            <input type="password" name="password" class="form-input" placeholder="••••••••" required>
+          </div>
+        </div>
+
+        <button type="submit" class="btn btn-primary btn-full" style="margin-top:6px;">
+          🛡️ &nbsp;{{ t.login }}
+        </button>
+      </form>
+
+      <!-- REGISTER -->
+      <form class="auth-form" id="form-register" method="POST" action="/login">
+        <input type="hidden" name="action" value="register">
+        <input type="hidden" name="lang" class="lang-hidden" value="{{ current_lang }}">
+
+        <div class="form-group">
+          <label class="form-label">{{ t.email }}</label>
+          <div class="input-wrap">
+            <span class="input-prefix">✉️</span>
+            <input type="email" name="email" class="form-input" placeholder="you@example.com" required>
+          </div>
+        </div>
+
+        <div class="form-group">
+          <label class="form-label">{{ t.password }}</label>
+          <div class="input-wrap">
+            <span class="input-prefix">🔑</span>
+            <input type="password" name="password" class="form-input" placeholder="Create a password" required>
+          </div>
+        </div>
+
+        <div class="form-group">
+          <label class="form-label">{{ t.account_type }}</label>
+          <div class="type-grid">
+            <div class="type-option">
+              <input type="radio" name="account_type" id="tp-private" value="private" checked>
+              <label class="type-label" for="tp-private">
+                <span class="type-emoji">🔒</span>
+                <span class="type-name">{{ t.private }}</span>
+                <span class="type-hint">Full social monitoring</span>
+              </label>
+            </div>
+            <div class="type-option">
+              <input type="radio" name="account_type" id="tp-public" value="public">
+              <label class="type-label" for="tp-public">
+                <span class="type-emoji">🌐</span>
+                <span class="type-name">{{ t.public }}</span>
+                <span class="type-hint">Protect selected photos</span>
+              </label>
+            </div>
+          </div>
+        </div>
+
+        <button type="submit" class="btn btn-primary btn-full">
+          🛡️ &nbsp;{{ t.register }}
+        </button>
+      </form>
+
+    </div>
+  </div>
+</div>
+<script src="{{ url_for('static', filename='js/main.js') }}"></script>
+</body>
+</html>

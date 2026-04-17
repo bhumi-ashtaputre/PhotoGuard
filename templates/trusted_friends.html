@@ -1,0 +1,121 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width,initial-scale=1">
+  <title>PhotoGuard — Trusted Friends</title>
+  <link rel="stylesheet" href="{{ url_for('static', filename='css/style.css') }}">
+</head>
+<body>
+<div class="page-wrapper">
+
+  <aside class="sidebar">
+    <div class="sidebar-logo">
+      <div class="logo-row">
+        <div class="logo-shield">🛡️</div>
+        <span class="logo-text">Photo<em>Guard</em></span>
+      </div>
+    </div>
+    <div class="sidebar-profile">
+      <div class="avatar">{{ user[0].upper() }}</div>
+      <div>
+        <div class="profile-email">{{ user }}</div>
+        <span class="badge {% if account_type=='private' %}badge-private{% else %}badge-public{% endif %}">{{ account_type|title }}</span>
+      </div>
+    </div>
+    <nav class="nav">
+      <div class="nav-label">Menu</div>
+      <a href="/home/{{ account_type }}" class="nav-link"><span class="nav-icon">🏠</span> {{ t.home }}</a>
+      {% if account_type == 'private' %}
+        <a href="/link-accounts" class="nav-link"><span class="nav-icon">🔗</span> {{ t.link_accounts }}</a>
+      {% else %}
+        <a href="/upload-photos" class="nav-link"><span class="nav-icon">📸</span> {{ t.upload_photos }}</a>
+      {% endif %}
+      <a href="/trusted-friends" class="nav-link active"><span class="nav-icon">👥</span> {{ t.trusted_friends }}</a>
+      <a href="/ai-detection" class="nav-link"><span class="nav-icon">🤖</span> {{ t.ai_detection }}</a>
+    </nav>
+    <div class="sidebar-footer">
+      <a href="/logout" class="logout-link">🚪 {{ t.logout }}</a>
+    </div>
+  </aside>
+
+  <main class="main">
+    <div class="topbar">
+      <button class="hamburger" onclick="toggleSidebar()">☰</button>
+      <div style="padding-left:12px;">
+        <div class="topbar-title">👥 {{ t.trusted_friends }}</div>
+        <div class="topbar-sub">Friends here can freely use your photos — no approval needed</div>
+      </div>
+    </div>
+
+    {% with messages = get_flashed_messages(with_categories=true) %}
+      {% if messages %}
+        <div class="flashes">
+          {% for cat, msg in messages %}
+            <div class="flash flash-{{ cat }}">{{ '✅' if cat=='success' else 'ℹ️' if cat=='info' else '❌' }} {{ msg }}</div>
+          {% endfor %}
+        </div>
+      {% endif %}
+    {% endwith %}
+
+    <div class="content">
+
+      <!-- Add friend -->
+      <div class="card">
+        <div class="card-head"><div class="card-icon">➕</div>Add a Trusted Friend</div>
+        <form method="POST" style="display:flex;gap:12px;align-items:flex-end;flex-wrap:wrap;">
+          <input type="hidden" name="action" value="add">
+          <div class="form-group" style="flex:1;min-width:220px;margin-bottom:0;">
+            <label class="form-label">Social Media ID or Username</label>
+            <div class="input-wrap">
+              <span class="input-prefix">👤</span>
+              <input type="text" name="friend_id" class="form-input"
+                     placeholder="e.g. @john_doe or john@email.com" required>
+            </div>
+          </div>
+          <button type="submit" class="btn btn-primary" style="flex-shrink:0;">➕ Add Friend</button>
+        </form>
+      </div>
+
+      <!-- Friend list -->
+      <div class="card">
+        <div class="card-head" style="justify-content:space-between;">
+          <span style="display:flex;align-items:center;gap:10px;">
+            <div class="card-icon">👥</div>
+            Your Trusted Friends
+          </span>
+          <span style="font-size:13px;color:var(--muted);font-weight:400;">{{ friends|length }} member{{ 's' if friends|length != 1 }}</span>
+        </div>
+
+        {% if friends %}
+          <div class="friend-list">
+            {% for friend in friends %}
+            <div class="friend-row">
+              <div class="friend-avatar">{{ friend[0].upper() if friend else '?' }}</div>
+              <span class="friend-id">{{ friend }}</span>
+              <span style="font-size:11px;color:var(--muted);margin-right:8px;">
+                <span class="status-dot dot-green"></span>Trusted
+              </span>
+              <form method="POST" style="margin:0;">
+                <input type="hidden" name="action" value="remove">
+                <input type="hidden" name="friend_id" value="{{ friend }}">
+                <button type="submit" class="btn btn-ghost btn-sm"
+                        style="color:var(--danger);border-color:rgba(239,68,68,0.3);">✕ Remove</button>
+              </form>
+            </div>
+            {% endfor %}
+          </div>
+        {% else %}
+          <div class="empty">
+            <div class="empty-icon">👥</div>
+            <div class="empty-text">No trusted friends yet. Add a username above to give them free access to your photos.</div>
+          </div>
+        {% endif %}
+      </div>
+
+    </div>
+  </main>
+</div>
+<script src="{{ url_for('static', filename='js/main.js') }}"></script>
+</body>
+</html>

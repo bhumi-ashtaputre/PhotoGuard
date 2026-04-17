@@ -1,0 +1,178 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width,initial-scale=1">
+  <title>PhotoGuard — Link Accounts</title>
+  <link rel="stylesheet" href="{{ url_for('static', filename='css/style.css') }}">
+</head>
+<body>
+<div class="page-wrapper">
+
+  <aside class="sidebar">
+    <div class="sidebar-logo">
+      <div class="logo-row">
+        <div class="logo-shield">🛡️</div>
+        <span class="logo-text">Photo<em>Guard</em></span>
+      </div>
+    </div>
+    <div class="sidebar-profile">
+      <div class="avatar">{{ user[0].upper() }}</div>
+      <div>
+        <div class="profile-email">{{ user }}</div>
+        <span class="badge badge-private">Private</span>
+      </div>
+    </div>
+    <nav class="nav">
+      <div class="nav-label">Menu</div>
+      <a href="/home/private" class="nav-link"><span class="nav-icon">🏠</span> {{ t.home }}</a>
+      <a href="/link-accounts" class="nav-link active"><span class="nav-icon">🔗</span> {{ t.link_accounts }}</a>
+      <a href="/trusted-friends" class="nav-link"><span class="nav-icon">👥</span> {{ t.trusted_friends }}</a>
+      <a href="/ai-detection" class="nav-link"><span class="nav-icon">🤖</span> {{ t.ai_detection }}</a>
+    </nav>
+    <div class="sidebar-footer">
+      <a href="/logout" class="logout-link">🚪 {{ t.logout }}</a>
+    </div>
+  </aside>
+
+  <main class="main">
+    <div class="topbar">
+      <button class="hamburger" onclick="toggleSidebar()">☰</button>
+      <div style="padding-left:12px;">
+        <div class="topbar-title">🔗 {{ t.link_accounts }}</div>
+        <div class="topbar-sub">Connect your social media for photo monitoring</div>
+      </div>
+    </div>
+
+    {% with messages = get_flashed_messages(with_categories=true) %}
+      {% if messages %}
+        <div class="flashes">
+          {% for cat, msg in messages %}
+            <div class="flash flash-{{ cat }}">{{ '✅' if cat=='success' else 'ℹ️' }} {{ msg }}</div>
+          {% endfor %}
+        </div>
+      {% endif %}
+    {% endwith %}
+
+    <div class="content">
+      <form method="POST">
+        <div class="card">
+          <div class="card-head"><div class="card-icon">📱</div>Social Media Accounts</div>
+          <p style="font-size:13px;color:var(--muted);margin-bottom:22px;">
+            Enter your usernames or handles. PhotoGuard monitors these accounts to detect unauthorized use of your photos.
+          </p>
+
+          <div class="social-grid stagger">
+
+            <div class="social-row">
+              <div class="social-icon" style="background:rgba(225,48,108,0.12);border:1px solid rgba(225,48,108,0.2);">📸</div>
+              <div style="flex:1;">
+                <div class="social-name">Instagram</div>
+                <div class="input-wrap" style="margin-top:6px;">
+                  <span class="input-prefix">@</span>
+                  <input type="text" name="instagram" class="form-input" placeholder="username" value="{{ links.get('instagram','') }}">
+                </div>
+              </div>
+              {% if links.get('instagram') %}<span style="color:var(--success);font-size:18px;">✓</span>{% endif %}
+            </div>
+
+            <div class="social-row">
+              <div class="social-icon" style="background:rgba(255,252,0,0.08);border:1px solid rgba(255,252,0,0.15);">👻</div>
+              <div style="flex:1;">
+                <div class="social-name">Snapchat</div>
+                <div class="input-wrap" style="margin-top:6px;">
+                  <span class="input-prefix">@</span>
+                  <input type="text" name="snapchat" class="form-input" placeholder="username" value="{{ links.get('snapchat','') }}">
+                </div>
+              </div>
+              {% if links.get('snapchat') %}<span style="color:var(--success);font-size:18px;">✓</span>{% endif %}
+            </div>
+
+            <div class="social-row">
+              <div class="social-icon" style="background:rgba(29,161,242,0.1);border:1px solid rgba(29,161,242,0.2);">🐦</div>
+              <div style="flex:1;">
+                <div class="social-name">Twitter / X</div>
+                <div class="input-wrap" style="margin-top:6px;">
+                  <span class="input-prefix">@</span>
+                  <input type="text" name="twitter" class="form-input" placeholder="handle" value="{{ links.get('twitter','') }}">
+                </div>
+              </div>
+              {% if links.get('twitter') %}<span style="color:var(--success);font-size:18px;">✓</span>{% endif %}
+            </div>
+
+            <div class="social-row">
+              <div class="social-icon" style="background:rgba(24,119,242,0.1);border:1px solid rgba(24,119,242,0.2);">👤</div>
+              <div style="flex:1;">
+                <div class="social-name">Facebook</div>
+                <div class="input-wrap" style="margin-top:6px;">
+                  <span class="input-prefix" style="font-size:11px;">fb/</span>
+                  <input type="text" name="facebook" class="form-input" placeholder="profile name" value="{{ links.get('facebook','') }}">
+                </div>
+              </div>
+              {% if links.get('facebook') %}<span style="color:var(--success);font-size:18px;">✓</span>{% endif %}
+            </div>
+
+            <div class="social-row">
+              <div class="social-icon" style="background:rgba(10,102,194,0.1);border:1px solid rgba(10,102,194,0.2);">💼</div>
+              <div style="flex:1;">
+                <div class="social-name">LinkedIn</div>
+                <div class="input-wrap" style="margin-top:6px;">
+                  <span class="input-prefix" style="font-size:11px;">in/</span>
+                  <input type="text" name="linkedin" class="form-input" placeholder="profile slug" value="{{ links.get('linkedin','') }}">
+                </div>
+              </div>
+              {% if links.get('linkedin') %}<span style="color:var(--success);font-size:18px;">✓</span>{% endif %}
+            </div>
+
+            <div class="social-row">
+              <div class="social-icon" style="background:rgba(255,0,80,0.08);border:1px solid rgba(255,0,80,0.15);">🎵</div>
+              <div style="flex:1;">
+                <div class="social-name">TikTok</div>
+                <div class="input-wrap" style="margin-top:6px;">
+                  <span class="input-prefix">@</span>
+                  <input type="text" name="tiktok" class="form-input" placeholder="username" value="{{ links.get('tiktok','') }}">
+                </div>
+              </div>
+              {% if links.get('tiktok') %}<span style="color:var(--success);font-size:18px;">✓</span>{% endif %}
+            </div>
+
+          </div>
+
+          <div style="margin-top:24px;">
+            <button type="submit" class="btn btn-primary">🔗 &nbsp;Save Linked Accounts</button>
+          </div>
+        </div>
+      </form>
+
+      <div class="card">
+        <div class="card-head"><div class="card-icon">💡</div>How Linking Works</div>
+        <div class="info-grid stagger">
+          <div class="info-box">
+            <div class="info-box-num">🔗</div>
+            <div class="info-box-title">Step 1 — Connect</div>
+            <div class="info-box-desc">Enter your handles above and save.</div>
+          </div>
+          <div class="info-box">
+            <div class="info-box-num">👁️</div>
+            <div class="info-box-title">Step 2 — Monitor</div>
+            <div class="info-box-desc">PhotoGuard scans for unauthorized use of your photos.</div>
+          </div>
+          <div class="info-box">
+            <div class="info-box-num">⚡</div>
+            <div class="info-box-title">Step 3 — Alert</div>
+            <div class="info-box-desc">Any misuse is flagged and you're notified immediately.</div>
+          </div>
+          <div class="info-box">
+            <div class="info-box-num">✅</div>
+            <div class="info-box-title">Step 4 — Control</div>
+            <div class="info-box-desc">Accept or decline usage requests directly from your dashboard.</div>
+          </div>
+        </div>
+      </div>
+
+    </div>
+  </main>
+</div>
+<script src="{{ url_for('static', filename='js/main.js') }}"></script>
+</body>
+</html>

@@ -1,0 +1,165 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width,initial-scale=1">
+  <title>PhotoGuard — AI Detection</title>
+  <link rel="stylesheet" href="{{ url_for('static', filename='css/style.css') }}">
+</head>
+<body>
+<div class="page-wrapper">
+
+  <aside class="sidebar">
+    <div class="sidebar-logo">
+      <div class="logo-row">
+        <div class="logo-shield">🛡️</div>
+        <span class="logo-text">Photo<em>Guard</em></span>
+      </div>
+    </div>
+    <div class="sidebar-profile">
+      <div class="avatar">{{ user[0].upper() }}</div>
+      <div>
+        <div class="profile-email">{{ user }}</div>
+        <span class="badge {% if account_type=='private' %}badge-private{% else %}badge-public{% endif %}">{{ account_type|title }}</span>
+      </div>
+    </div>
+    <nav class="nav">
+      <div class="nav-label">Menu</div>
+      <a href="/home/{{ account_type }}" class="nav-link"><span class="nav-icon">🏠</span> {{ t.home }}</a>
+      {% if account_type == 'private' %}
+        <a href="/link-accounts" class="nav-link"><span class="nav-icon">🔗</span> {{ t.link_accounts }}</a>
+      {% else %}
+        <a href="/upload-photos" class="nav-link"><span class="nav-icon">📸</span> {{ t.upload_photos }}</a>
+      {% endif %}
+      <a href="/trusted-friends" class="nav-link"><span class="nav-icon">👥</span> {{ t.trusted_friends }}</a>
+      <a href="/ai-detection" class="nav-link active"><span class="nav-icon">🤖</span> {{ t.ai_detection }}</a>
+    </nav>
+    <div class="sidebar-footer">
+      <a href="/logout" class="logout-link">🚪 {{ t.logout }}</a>
+    </div>
+  </aside>
+
+  <main class="main">
+    <div class="topbar">
+      <button class="hamburger" onclick="toggleSidebar()">☰</button>
+      <div style="padding-left:12px;">
+        <div class="topbar-title">🤖 {{ t.ai_detection }}</div>
+        <div class="topbar-sub">Detect AI-generated, morphed, or tampered photos</div>
+      </div>
+    </div>
+
+    <div class="content">
+
+      <div class="card">
+        <div class="card-head"><div class="card-icon">📤</div>Upload Photos to Analyze</div>
+        <form method="POST" enctype="multipart/form-data">
+          <div class="upload-2col" style="margin-bottom:20px;">
+
+            <div>
+              <label class="form-label" style="margin-bottom:10px;">Original Photo (Your Photo)</label>
+              <div class="upload-zone" id="zone-original">
+                <input type="file" name="original_photo" id="original_photo" accept="image/*" required>
+                <div class="upload-zone-icon">🖼️</div>
+                <div class="upload-zone-title">Upload Original</div>
+                <div class="upload-zone-hint">Click or drag & drop</div>
+              </div>
+              <div id="preview-original"></div>
+            </div>
+
+            <div>
+              <label class="form-label" style="margin-bottom:10px;">Suspect Photo (To Check)</label>
+              <div class="upload-zone" id="zone-suspect">
+                <input type="file" name="suspect_photo" id="suspect_photo" accept="image/*" required>
+                <div class="upload-zone-icon">🔍</div>
+                <div class="upload-zone-title">Upload Suspect</div>
+                <div class="upload-zone-hint">Click or drag & drop</div>
+              </div>
+              <div id="preview-suspect"></div>
+            </div>
+
+          </div>
+          <button type="submit" class="btn btn-primary">🔍 &nbsp;Analyze Now</button>
+        </form>
+      </div>
+
+      {% if result %}
+        {% if result.get('error') %}
+          <div class="flash flash-error">❌ Analysis error: {{ result.error }}</div>
+        {% else %}
+          <div class="card fade-up">
+            <div class="card-head"><div class="card-icon">📊</div>Analysis Results</div>
+
+            <div class="result-panel">
+              <div class="verdict-box {% if result.is_ai %}verdict-ai{% else %}verdict-authentic{% endif %}">
+                <div class="verdict-icon">{{ '⚠️' if result.is_ai else '✅' }}</div>
+                <div>
+                  <div class="verdict-title">{{ result.verdict }}</div>
+                  <div class="verdict-sub">Analysis complete — see metrics below</div>
+                </div>
+              </div>
+
+              <div class="metrics">
+                <div class="metric-box">
+                  <div class="metric-val {% if result.similarity > 70 %}c-green{% elif result.similarity > 40 %}c-amber{% else %}c-red{% endif %}">
+                    {{ result.similarity }}%
+                  </div>
+                  <div class="metric-lbl">Photo Similarity</div>
+                  <div class="bar-wrap">
+                    <div class="bar {% if result.similarity > 70 %}green{% elif result.similarity > 40 %}amber{% else %}red{% endif %}"
+                         data-width="{{ result.similarity }}" style="width:0%"></div>
+                  </div>
+                </div>
+
+                <div class="metric-box">
+                  <div class="metric-val {% if result.ai_probability > 55 %}c-red{% elif result.ai_probability > 30 %}c-amber{% else %}c-green{% endif %}">
+                    {{ result.ai_probability }}%
+                  </div>
+                  <div class="metric-lbl">AI Probability</div>
+                  <div class="bar-wrap">
+                    <div class="bar {% if result.ai_probability > 55 %}red{% elif result.ai_probability > 30 %}amber{% else %}green{% endif %}"
+                         data-width="{{ result.ai_probability }}" style="width:0%"></div>
+                  </div>
+                </div>
+              </div>
+
+              <div style="margin-top:14px;padding:13px 16px;background:var(--navy-2);border:1px solid var(--border);border-radius:var(--r);display:flex;justify-content:space-between;align-items:center;">
+                <span style="font-size:13px;color:var(--muted);">Match Classification</span>
+                <span style="font-size:14px;font-weight:700;color:var(--off-white);">{{ result.match }}</span>
+              </div>
+            </div>
+          </div>
+        {% endif %}
+      {% endif %}
+
+      <div class="card">
+        <div class="card-head"><div class="card-icon">🔬</div>What We Detect</div>
+        <div class="info-grid stagger">
+          <div class="info-box">
+            <div class="info-box-num">🎨</div>
+            <div class="info-box-title">AI Generated</div>
+            <div class="info-box-desc">Detects images synthesized by AI models like Midjourney or Stable Diffusion.</div>
+          </div>
+          <div class="info-box">
+            <div class="info-box-num">✂️</div>
+            <div class="info-box-title">Face Morphing</div>
+            <div class="info-box-desc">Identifies face-swap and deepfake manipulation in photos.</div>
+          </div>
+          <div class="info-box">
+            <div class="info-box-num">🔍</div>
+            <div class="info-box-title">Pixel Similarity</div>
+            <div class="info-box-desc">Compares pixel-level data between your original and suspect photo.</div>
+          </div>
+          <div class="info-box">
+            <div class="info-box-num">📊</div>
+            <div class="info-box-title">Noise Fingerprint</div>
+            <div class="info-box-desc">Analyzes digital noise patterns that expose AI-generated content.</div>
+          </div>
+        </div>
+      </div>
+
+    </div>
+  </main>
+</div>
+<script src="{{ url_for('static', filename='js/main.js') }}"></script>
+</body>
+</html>

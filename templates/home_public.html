@@ -1,0 +1,151 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width,initial-scale=1">
+  <title>PhotoGuard — Dashboard (Public)</title>
+  <link rel="stylesheet" href="{{ url_for('static', filename='css/style.css') }}">
+</head>
+<body>
+<div class="page-wrapper">
+
+  <aside class="sidebar">
+    <div class="sidebar-logo">
+      <div class="logo-row">
+        <div class="logo-shield">🛡️</div>
+        <span class="logo-text">Photo<em>Guard</em></span>
+      </div>
+    </div>
+    <div class="sidebar-profile">
+      <div class="avatar">{{ user[0].upper() }}</div>
+      <div>
+        <div class="profile-email">{{ user }}</div>
+        <span class="badge badge-public">Public</span>
+      </div>
+    </div>
+    <nav class="nav">
+      <div class="nav-label">Menu</div>
+      <a href="/home/public" class="nav-link active">
+        <span class="nav-icon">🏠</span> {{ t.home }}
+      </a>
+      <a href="/upload-photos" class="nav-link">
+        <span class="nav-icon">📸</span> {{ t.upload_photos }}
+      </a>
+      <a href="/trusted-friends" class="nav-link">
+        <span class="nav-icon">👥</span> {{ t.trusted_friends }}
+      </a>
+      <a href="/ai-detection" class="nav-link">
+        <span class="nav-icon">🤖</span> {{ t.ai_detection }}
+      </a>
+    </nav>
+    <div class="sidebar-footer">
+      <a href="/logout" class="logout-link">🚪 {{ t.logout }}</a>
+    </div>
+  </aside>
+
+  <main class="main">
+    <div class="topbar">
+      <div>
+        <button class="hamburger" onclick="toggleSidebar()">☰</button>
+      </div>
+      <div style="flex:1; padding-left:12px;">
+        <div class="topbar-title">Welcome back 👋</div>
+        <div class="topbar-sub">Public account &nbsp;·&nbsp; <span class="status-dot dot-green"></span>Protection Active</div>
+      </div>
+    </div>
+
+    <div class="content">
+
+      <div class="stats-row stagger">
+        <div class="stat-card">
+          <div class="stat-orb orb-blue">📸</div>
+          <div>
+            <div class="stat-num">0</div>
+            <div class="stat-lbl">Protected Photos</div>
+          </div>
+        </div>
+        <div class="stat-card">
+          <div class="stat-orb orb-cyan">👥</div>
+          <div>
+            <div class="stat-num">0</div>
+            <div class="stat-lbl">Trusted Friends</div>
+          </div>
+        </div>
+        <div class="stat-card">
+          <div class="stat-orb orb-green">🛡️</div>
+          <div>
+            <div class="stat-num" style="color:var(--success);">ON</div>
+            <div class="stat-lbl">Protection Status</div>
+          </div>
+        </div>
+        <div class="stat-card">
+          <div class="stat-orb orb-amber">🤖</div>
+          <div>
+            <div class="stat-num">0</div>
+            <div class="stat-lbl">Scans Run</div>
+          </div>
+        </div>
+      </div>
+
+      <div class="card">
+        <div class="card-head">
+          <div class="card-icon">⚡</div>
+          Quick Actions
+        </div>
+        <div class="tiles stagger">
+          <a href="/upload-photos" class="tile">
+            <div class="tile-icon">📸</div>
+            <div class="tile-title">Upload Photos</div>
+            <div class="tile-desc">Upload the specific photos you want PhotoGuard to monitor and protect.</div>
+            <div class="tile-arrow">Go → </div>
+          </a>
+          <a href="/trusted-friends" class="tile">
+            <div class="tile-icon">👥</div>
+            <div class="tile-title">Trusted Friends</div>
+            <div class="tile-desc">Add friends who can freely use your photos without needing your approval.</div>
+            <div class="tile-arrow">Go → </div>
+          </a>
+          <a href="/ai-detection" class="tile">
+            <div class="tile-icon">🤖</div>
+            <div class="tile-title">AI Detection</div>
+            <div class="tile-desc">Check if a photo has been AI-generated, morphed, or manipulated.</div>
+            <div class="tile-arrow">Go → </div>
+          </a>
+        </div>
+      </div>
+
+      <div class="card">
+        <div class="card-head">
+          <div class="card-icon">ℹ️</div>
+          How Public Mode Works
+        </div>
+        <div class="info-grid stagger">
+          <div class="info-box">
+            <div class="info-box-num">1️⃣</div>
+            <div class="info-box-title">Upload Photos</div>
+            <div class="info-box-desc">Only the photos you upload will be monitored — your choice, your control.</div>
+          </div>
+          <div class="info-box">
+            <div class="info-box-num">2️⃣</div>
+            <div class="info-box-title">Selective Guard</div>
+            <div class="info-box-desc">Requests only arrive for photos you've explicitly added to protection.</div>
+          </div>
+          <div class="info-box">
+            <div class="info-box-num">3️⃣</div>
+            <div class="info-box-title">Trusted Access</div>
+            <div class="info-box-desc">Friends in your trusted list bypass approval automatically.</div>
+          </div>
+          <div class="info-box">
+            <div class="info-box-num">4️⃣</div>
+            <div class="info-box-title">AI Verification</div>
+            <div class="info-box-desc">Spot deepfakes or morphed versions of your photos instantly.</div>
+          </div>
+        </div>
+      </div>
+
+    </div>
+  </main>
+</div>
+<script src="{{ url_for('static', filename='js/main.js') }}"></script>
+</body>
+</html>
